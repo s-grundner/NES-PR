@@ -81,7 +81,7 @@ void PeriphCommonClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-void USR_SEG_FlashDC(uint16_t period_ms, float dc)
+void USR_SEG_FlashDP(uint16_t period_ms, float dc)
 {
   HAL_GPIO_WritePin(SEGDP_GPIO_Port, SEGDP_Pin, GPIO_PIN_SET);
   HAL_Delay(period_ms * dc);
@@ -183,13 +183,13 @@ int main(void)
   MX_USB_OTG_FS_USB_Init();
   /* USER CODE BEGIN 2 */
 
-  Button_t step_up;
-  Button_t step_dn;
+  Button_t step_up; // BTN1 (PB3 onboard button)
+  Button_t step_dn; // BTN2 (PB4 onboard button)
 
-  USR_BTN_Init(&step_dn, BTN1_GPIO_Port, BTN1_Pin);
   USR_BTN_Init(&step_up, BTN1_GPIO_Port, BTN1_Pin);
+  USR_BTN_Init(&step_dn, BTN2_GPIO_Port, BTN2_Pin);
 
-  int16_t curr_period = MIN_PERIOD_MS;
+  int16_t curr_period_ms = MIN_PERIOD_MS;
 
   /* USER CODE END 2 */
 
@@ -200,33 +200,14 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-
-    USR_SEG_FlashDC(curr_period, DC);
-
+    USR_SEG_FlashDP(curr_period_ms, DC);
     USR_BTN_Check(&step_up);
     USR_BTN_Check(&step_dn);
+    int8_t sgn = (step_up.has_changed - step_dn.has_changed);
 
-    if (step_up.has_changed)
-    {
-      curr_period += STEP_SIZE_MS;
-      if (curr_period > MAX_PERIOD_MS)
-      {
-        curr_period = MAX_PERIOD_MS;
-      }
-    }
+    if (sgn == 0) continue;
 
-    if (step_dn.has_changed)
-    {
-      curr_period -= STEP_SIZE_MS;
-      if (curr_period < MIN_PERIOD_MS)
-      {
-        curr_period = MIN_PERIOD_MS;
-      }
-    }
-
-
-
-
+    curr_period_ms += sgn * STEP_SIZE_MS;
   }
   /* USER CODE END 3 */
 }
