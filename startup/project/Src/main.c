@@ -102,7 +102,14 @@ void USR_BTN_Init(Button_t *btn, GPIO_TypeDef *GPIOx, uint16_t pin)
 void USR_BTN_Check(Button_t *btn)
 {
   btn->curr = HAL_GPIO_ReadPin(btn->GPIOx, btn->pin);
-  btn->has_changed = (btn->curr && !btn->prev);
+  if (btn->curr != btn->prev)
+  {
+    btn->has_changed = 1;
+  }
+  else
+  {
+    btn->has_changed = 0;
+  }
   btn->prev = btn->curr;
 }
 
@@ -201,6 +208,8 @@ int main(void)
   {
     /* USER CODE END WHILE */
 
+    USR_SEG_FlashDC(curr_period, DC);
+
     USR_BTN_Check(&step_up);
     USR_BTN_Check(&step_dn);
 
@@ -219,8 +228,6 @@ int main(void)
     {
       curr_period = MAX_PERIOD_MS;
     }
-
-    USR_SEG_FlashDC(curr_period, DC);
 
     /* USER CODE BEGIN 3 */
   }
