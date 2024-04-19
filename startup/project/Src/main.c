@@ -102,14 +102,7 @@ void USR_BTN_Init(Button_t *btn, GPIO_TypeDef *GPIOx, uint16_t pin)
 void USR_BTN_Check(Button_t *btn)
 {
   btn->curr = HAL_GPIO_ReadPin(btn->GPIOx, btn->pin);
-  if (btn->curr != btn->prev)
-  {
-    btn->has_changed = 1;
-  }
-  else
-  {
-    btn->has_changed = 0;
-  }
+  btn->has_changed = (btn->prev && !btn->curr); // determine rising, falling or both edges here
   btn->prev = btn->curr;
 }
 
@@ -209,16 +202,12 @@ int main(void)
     /* USER CODE END WHILE */
 
     USR_SEG_FlashDC(curr_period, DC);
-
     USR_BTN_Check(&step_up);
     USR_BTN_Check(&step_dn);
-
-    int8_t sgn = step_up.has_changed - step_dn.has_changed;
-
-    if (sgn == 0)
+    if (!step_up.has_changed)
       continue;
 
-    curr_period += sgn * STEP_SIZE_MS;
+    curr_period += STEP_SIZE_MS;
 
     if (curr_period < MIN_PERIOD_MS)
     {
