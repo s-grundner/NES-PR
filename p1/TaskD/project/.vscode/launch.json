@@ -10,7 +10,6 @@
             "request": "launch",
             "servertype": "bmp",
             "BMPGDBSerialPort": "dummy",
-            "showDevDebugOutput": "raw",
             "linux": {
                 "armToolchainPath": "${env:ELITEBOARDDIR}",
                 "BMPGDBSerialPort": "/dev/ttyACM0",
@@ -46,7 +45,7 @@
             },
             "runToEntryPoint": "main",
             "cwd": "${workspaceFolder}",
-            "executable": "./build/startup.elf",
+            "executable": "./build/TaskD.elf",
             "svdFile": "./../STM32H743x.svd",
             "preLaunchTask": "Build project"
         }

@@ -41,9 +41,8 @@
 
 typedef struct {
   GPIO_TypeDef* GPIOx;
-  uint32_t pin;
+  uint32_t GPIO_Pin;
   uint8_t prev;
-  uint8_t curr;
   uint8_t has_changed;
 } Button_t;
 
@@ -54,14 +53,15 @@ typedef struct {
 
 #define MIN_PERIOD_MS (100)
 #define MAX_PERIOD_MS (1000)
-#define BLINK_COUNT (15)
-#define DC (0.5f)
 #define STEP_SIZE_MS (100)
+#define DC (0.5f)
 
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
+
+#define LIMIT(x, min, max) ((x) < (min) ? (min) : (x) > (max) ? (max) : (x))
 
 /* USER CODE END PM */
 
@@ -89,20 +89,19 @@ void USR_SEG_FlashDP(uint16_t period_ms, float dc)
   HAL_Delay(period_ms * (1.0f - dc));
 }
 
-void USR_BTN_Init(Button_t* btn, GPIO_TypeDef* GPIOx, uint16_t pin)
+void USR_BTN_Init(Button_t* btn, GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
 {
   btn->GPIOx = GPIOx;
-  btn->pin = pin;
-  btn->curr = HAL_GPIO_ReadPin(GPIOx, pin);
-  btn->prev = HAL_GPIO_ReadPin(GPIOx, pin);
+  btn->GPIO_Pin = GPIO_Pin;
+  btn->prev = HAL_GPIO_ReadPin(GPIOx, GPIO_Pin);
   btn->has_changed = 0;
 }
 
 void USR_BTN_Check(Button_t* btn)
 {
-  btn->curr = HAL_GPIO_ReadPin(btn->GPIOx, btn->pin);
-  btn->has_changed = (btn->prev && !btn->curr);
-  btn->prev = btn->curr;
+  GPIO_PinState curr = HAL_GPIO_ReadPin(btn->GPIOx, btn->GPIO_Pin);
+  btn->has_changed = (!curr && btn->prev);
+  btn->prev = curr;
 }
 
 /* USER CODE END 0 */
@@ -205,9 +204,13 @@ int main(void)
     USR_BTN_Check(&step_dn);
     int8_t sgn = (step_up.has_changed - step_dn.has_changed);
 
+    // sgn = 1 if only step_up has changed,
+    // -1 if only step_dn has changed, 0 otherwise
     if (sgn == 0) continue;
 
     curr_period_ms += sgn * STEP_SIZE_MS;
+    // Limit curr_period_ms to [MIN_PERIOD_MS, MAX_PERIOD_MS]
+    curr_period_ms = LIMIT(curr_period_ms, MIN_PERIOD_MS, MAX_PERIOD_MS);
   }
   /* USER CODE END 3 */
 }
