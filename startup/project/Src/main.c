@@ -39,10 +39,25 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
+typedef struct
+{
+  GPIO_TypeDef *GPIOx;
+  uint32_t pin;
+  uint8_t prev;
+  uint8_t curr;
+  uint8_t has_changed;
+} Button_t;
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
+#define MIN_PERIOD_MS (100)
+#define MAX_PERIOD_MS (1000)
+#define BLINK_COUNT (15)
+#define DC (0.5f)
+#define STEP_SIZE_MS (100)
 
 /* USER CODE END PD */
 
@@ -66,6 +81,30 @@ void PeriphCommonClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+void USR_SEG_FlashDC(uint16_t period_ms, float dc)
+{
+  HAL_GPIO_WritePin(SEGDP_GPIO_Port, SEGDP_Pin, GPIO_PIN_SET);
+  HAL_Delay(period_ms * dc);
+  HAL_GPIO_WritePin(SEGDP_GPIO_Port, SEGDP_Pin, GPIO_PIN_RESET);
+  HAL_Delay(period_ms * (1 - dc));
+}
+
+void USR_BTN_Init(Button_t *btn, GPIO_TypeDef *GPIOx, uint16_t pin)
+{
+  btn->GPIOx = GPIOx;
+  btn->pin = pin;
+  btn->curr = HAL_GPIO_ReadPin(GPIOx, pin);
+  btn->prev = HAL_GPIO_ReadPin(GPIOx, pin);
+  btn->has_changed = 0;
+}
+
+void USR_BTN_Check(Button_t *btn)
+{
+  btn->curr = HAL_GPIO_ReadPin(btn->GPIOx, btn->pin);
+  btn->has_changed = (btn->curr && !btn->prev);
+  btn->prev = btn->curr;
+}
 
 /* USER CODE END 0 */
 
@@ -143,8 +182,17 @@ int main(void)
   MX_TIM16_Init();
   MX_TIM17_Init();
   MX_USB_OTG_FS_USB_Init();
+
   /* USER CODE BEGIN 2 */
-  unsigned char var = 0;
+
+  Button_t step_up;
+  Button_t step_dn;
+
+  USR_BTN_Init(&step_dn, BTN1_GPIO_Port, BTN1_Pin);
+  USR_BTN_Init(&step_up, BTN1_GPIO_Port, BTN1_Pin);
+
+  int16_t curr_period = MIN_PERIOD_MS;
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -153,9 +201,28 @@ int main(void)
   {
     /* USER CODE END WHILE */
 
+    USR_BTN_Check(&step_up);
+    USR_BTN_Check(&step_dn);
+
+    int8_t sgn = step_up.has_changed - step_dn.has_changed;
+
+    if (sgn == 0)
+      continue;
+
+    curr_period += sgn * STEP_SIZE_MS;
+
+    if (curr_period < MIN_PERIOD_MS)
+    {
+      curr_period = MIN_PERIOD_MS;
+    }
+    if (curr_period > MAX_PERIOD_MS)
+    {
+      curr_period = MAX_PERIOD_MS;
+    }
+
+    USR_SEG_FlashDC(curr_period, DC);
+
     /* USER CODE BEGIN 3 */
-    var++;
-    var %= 256;
   }
   /* USER CODE END 3 */
 }
@@ -180,10 +247,6 @@ void SystemClock_Config(void)
   while (!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY))
   {
   }
-
-  /** Macro to configure the PLL clock source
-   */
-  __HAL_RCC_PLL_PLLSOURCE_CONFIG(RCC_PLLSOURCE_HSE);
 
   /** Initializes the RCC Oscillators according to the specified parameters
    * in the RCC_OscInitTypeDef structure.
