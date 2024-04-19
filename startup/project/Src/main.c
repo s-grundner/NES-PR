@@ -15,8 +15,8 @@
  *
  ******************************************************************************
  */
-/* USER CODE END Header */
-/* Includes ------------------------------------------------------------------*/
+ /* USER CODE END Header */
+ /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
 #include "dac.h"
@@ -39,9 +39,8 @@
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
 
-typedef struct
-{
-  GPIO_TypeDef *GPIOx;
+typedef struct {
+  GPIO_TypeDef* GPIOx;
   uint32_t pin;
   uint8_t prev;
   uint8_t curr;
@@ -87,10 +86,10 @@ void USR_SEG_FlashDC(uint16_t period_ms, float dc)
   HAL_GPIO_WritePin(SEGDP_GPIO_Port, SEGDP_Pin, GPIO_PIN_SET);
   HAL_Delay(period_ms * dc);
   HAL_GPIO_WritePin(SEGDP_GPIO_Port, SEGDP_Pin, GPIO_PIN_RESET);
-  HAL_Delay(period_ms * (1 - dc));
+  HAL_Delay(period_ms * (1.0f - dc));
 }
 
-void USR_BTN_Init(Button_t *btn, GPIO_TypeDef *GPIOx, uint16_t pin)
+void USR_BTN_Init(Button_t* btn, GPIO_TypeDef* GPIOx, uint16_t pin)
 {
   btn->GPIOx = GPIOx;
   btn->pin = pin;
@@ -99,25 +98,25 @@ void USR_BTN_Init(Button_t *btn, GPIO_TypeDef *GPIOx, uint16_t pin)
   btn->has_changed = 0;
 }
 
-void USR_BTN_Check(Button_t *btn)
+void USR_BTN_Check(Button_t* btn)
 {
   btn->curr = HAL_GPIO_ReadPin(btn->GPIOx, btn->pin);
-  btn->has_changed = (btn->prev && !btn->curr); // determine rising, falling or both edges here
+  btn->has_changed = (btn->prev && !btn->curr);
   btn->prev = btn->curr;
 }
 
 /* USER CODE END 0 */
 
 /**
- * @brief  The application entry point.
- * @retval int
- */
+  * @brief  The application entry point.
+  * @retval int
+  */
 int main(void)
 {
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
-  /* Enable the CPU Cache */
+/* Enable the CPU Cache */
 
   /* Enable I-Cache---------------------------------------------------------*/
   SCB_EnableICache();
@@ -182,7 +181,6 @@ int main(void)
   MX_TIM16_Init();
   MX_TIM17_Init();
   MX_USB_OTG_FS_USB_Init();
-
   /* USER CODE BEGIN 2 */
 
   Button_t step_up;
@@ -201,53 +199,62 @@ int main(void)
   {
     /* USER CODE END WHILE */
 
+    /* USER CODE BEGIN 3 */
+
     USR_SEG_FlashDC(curr_period, DC);
+
     USR_BTN_Check(&step_up);
     USR_BTN_Check(&step_dn);
-    if (!step_up.has_changed)
-      continue;
 
-    curr_period += STEP_SIZE_MS;
-
-    if (curr_period < MIN_PERIOD_MS)
+    if (step_up.has_changed)
     {
-      curr_period = MIN_PERIOD_MS;
-    }
-    if (curr_period > MAX_PERIOD_MS)
-    {
-      curr_period = MAX_PERIOD_MS;
+      curr_period += STEP_SIZE_MS;
+      if (curr_period > MAX_PERIOD_MS)
+      {
+        curr_period = MAX_PERIOD_MS;
+      }
     }
 
-    /* USER CODE BEGIN 3 */
+    if (step_dn.has_changed)
+    {
+      curr_period -= STEP_SIZE_MS;
+      if (curr_period < MIN_PERIOD_MS)
+      {
+        curr_period = MIN_PERIOD_MS;
+      }
+    }
+
+
+
+
   }
   /* USER CODE END 3 */
 }
 
 /**
- * @brief System Clock Configuration
- * @retval None
- */
+  * @brief System Clock Configuration
+  * @retval None
+  */
 void SystemClock_Config(void)
 {
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
 
   /** Supply configuration update enable
-   */
+  */
   HAL_PWREx_ConfigSupply(PWR_LDO_SUPPLY);
 
   /** Configure the main internal regulator output voltage
-   */
+  */
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
 
-  while (!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY))
-  {
-  }
+  while (!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {}
 
   /** Initializes the RCC Oscillators according to the specified parameters
-   * in the RCC_OscInitTypeDef structure.
-   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48 | RCC_OSCILLATORTYPE_LSI | RCC_OSCILLATORTYPE_HSE;
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48 | RCC_OSCILLATORTYPE_LSI
+    | RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
@@ -267,8 +274,10 @@ void SystemClock_Config(void)
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
-   */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2 | RCC_CLOCKTYPE_D3PCLK1 | RCC_CLOCKTYPE_D1PCLK1;
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
+    | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2
+    | RCC_CLOCKTYPE_D3PCLK1 | RCC_CLOCKTYPE_D1PCLK1;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.SYSCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_HCLK_DIV1;
@@ -284,15 +293,15 @@ void SystemClock_Config(void)
 }
 
 /**
- * @brief Peripherals Common Clock Configuration
- * @retval None
- */
+  * @brief Peripherals Common Clock Configuration
+  * @retval None
+  */
 void PeriphCommonClock_Config(void)
 {
-  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = { 0 };
 
   /** Initializes the peripherals clock
-   */
+  */
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_ADC;
   PeriphClkInitStruct.PLL2.PLL2M = 1;
   PeriphClkInitStruct.PLL2.PLL2N = 9;
@@ -314,9 +323,9 @@ void PeriphCommonClock_Config(void)
 /* USER CODE END 4 */
 
 /**
- * @brief  This function is executed in case of error occurrence.
- * @retval None
- */
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
@@ -328,19 +337,19 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef USE_FULL_ASSERT
+#ifdef  USE_FULL_ASSERT
 /**
- * @brief  Reports the name of the source file and the source line number
- *         where the assert_param error has occurred.
- * @param  file: pointer to the source file name
- * @param  line: assert_param error line source number
- * @retval None
- */
-void assert_failed(uint8_t *file, uint32_t line)
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
+void assert_failed(uint8_t* file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
      ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-  /* USER CODE END 6 */
+     /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
