@@ -15,7 +15,7 @@ Networked Embedded Systems Practicum
 
 ## Practicum Execise 2
 
-- [Documentation](p1/docs/Practicum2_Group8.pdf)
+- [Documentation](p2/docs/Practicum2_Group8.pdf)
 - [Task A:](p2/TaskA/project/Src/main.c)
 - [Task B:](p2/TaskB/project/Src/main.c)
 - [Task C:](p2/TaskC/project/Src/main.c)
