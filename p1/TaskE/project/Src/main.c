@@ -46,15 +46,29 @@ typedef struct {
   uint8_t has_changed;
 } Button_t;
 
+typedef struct {
+  GPIO_TypeDef* GPIOx;
+  uint32_t pin_mask;
+  const uint16_t* segments;
+  uint8_t curr_num;
+  uint8_t max_num;
+  uint8_t min_num;
+} Segment_t;
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-#define MIN_PERIOD_MS (100)
-#define MAX_PERIOD_MS (1000)
-#define STEP_SIZE_MS (100)
+#define MIN_PERIOD_MS (200)
+#define MAX_PERIOD_MS (1900)
+#define STEP_SIZE_MS (200)
 #define DC (0.5f)
+
+#define SEG_MAX_NUM (9)
+#define SEG_MIN_NUM (0)
+#define SEG_NUM_COUNT (SEG_MAX_NUM - SEG_MIN_NUM + 1)
+#define SEG_MASK (SEGA_Pin | SEGB_Pin | SEGC_Pin | SEGD_Pin | SEGE_Pin | SEGF_Pin | SEGG_Pin)
 
 /* USER CODE END PD */
 
@@ -68,6 +82,19 @@ typedef struct {
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+
+const uint16_t segments[] = {
+  /* 0 */ SEG_MASK & ~(SEGG_Pin),
+  /* 1 */ SEGB_Pin | SEGC_Pin,
+  /* 2 */ SEG_MASK & ~(SEGC_Pin | SEGF_Pin),
+  /* 3 */ SEG_MASK & ~(SEGE_Pin | SEGF_Pin),
+  /* 4 */ SEG_MASK & ~(SEGA_Pin | SEGD_Pin | SEGE_Pin),
+  /* 5 */ SEG_MASK & ~(SEGB_Pin | SEGE_Pin),
+  /* 6 */ SEG_MASK & ~(SEGB_Pin),
+  /* 7 */ SEGA_Pin | SEGB_Pin | SEGC_Pin,
+  /* 8 */ SEG_MASK,
+  /* 9 */ SEG_MASK & ~(SEGE_Pin)
+};
 
 /* USER CODE END PV */
 
@@ -100,8 +127,23 @@ void USR_BTN_Init(Button_t* btn, GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
 void USR_BTN_Check(Button_t* btn)
 {
   GPIO_PinState curr = HAL_GPIO_ReadPin(btn->GPIOx, btn->GPIO_Pin);
-  btn->has_changed = (!curr && btn->prev);
+  btn->has_changed = (!btn->prev && curr);
   btn->prev = curr;
+}
+
+void USR_SEG_Init(Segment_t* seg, GPIO_TypeDef* GPIOx, const uint16_t* segments, uint8_t min_num, uint8_t max_num)
+{
+  seg->GPIOx = GPIOx;
+  seg->pin_mask = segments[8];
+  seg->segments = segments;
+  seg->min_num = min_num;
+  seg->max_num = max_num;
+}
+
+void USR_SEG_Write(Segment_t* seg, int num)
+{
+  seg->curr_num = LIMIT(num, seg->min_num, seg->max_num);
+  MODIFY_REG(seg->GPIOx->ODR, seg->pin_mask, seg->segments[seg->curr_num]);
 }
 
 /* USER CODE END 0 */
@@ -184,9 +226,13 @@ int main(void)
 
   Button_t step_up; // BTN1 (PB3 onboard button)
   Button_t step_dn; // BTN2 (PB4 onboard button)
+  Segment_t seg;
 
+  USR_SEG_Init(&seg, SEGA_GPIO_Port, segments, SEG_MIN_NUM, SEG_MAX_NUM);
   USR_BTN_Init(&step_up, BTN1_GPIO_Port, BTN1_Pin);
   USR_BTN_Init(&step_dn, BTN2_GPIO_Port, BTN2_Pin);
+
+  USR_SEG_Write(&seg, 0);
 
   int16_t curr_period_ms = MIN_PERIOD_MS;
 
@@ -204,12 +250,10 @@ int main(void)
     USR_BTN_Check(&step_dn);
     int8_t sgn = (step_up.has_changed - step_dn.has_changed);
 
-    // sgn = 1 if only step_up has changed,
-    // -1 if only step_dn has changed, 0 otherwise
     if (sgn == 0) continue;
 
+    USR_SEG_Write(&seg, seg.curr_num + sgn);
     curr_period_ms += sgn * STEP_SIZE_MS;
-    // Limit curr_period_ms to [MIN_PERIOD_MS, MAX_PERIOD_MS]
     curr_period_ms = LIMIT(curr_period_ms, MIN_PERIOD_MS, MAX_PERIOD_MS);
   }
   /* USER CODE END 3 */
