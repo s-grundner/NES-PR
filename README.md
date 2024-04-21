@@ -4,7 +4,7 @@ Networked Embedded Systems Practicum
 
 - [Build instructions](pdf/Instructions.pdf)
 
-## Practicum Execise 1
+## Practicum Execise 1 - GPIO
 
 - [Documentation](p1/docs/Practicum1_Group8.pdf)
 - Task A: Blink an LED
@@ -13,7 +13,7 @@ Networked Embedded Systems Practicum
 - [Task D:](p1/TaskD/project/Src/main.c) Vary the Blinking Frequency with Push Buttons
 - [Task E:](p1/TaskE/project/Src/main.c) Display the Current Steps
 
-## Practicum Execise 2
+## Practicum Execise 2 - Timers
 
 - [Documentation](p2/docs/Practicum2_Group8.pdf)
 - [Task A:](p2/TaskA/project/Src/main.c) Blink an LED with Timer Module
