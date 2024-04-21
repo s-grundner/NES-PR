@@ -7,9 +7,9 @@ Networked Embedded Systems Practicum
 ## Practicum Execise 1 - [GPIO](p1/docs/Practicum1_TaskSheet_GPIO.pdf)
 
 - [Documentation](p1/docs/Practicum1_Group8.pdf)
-- Task A: Blink an LED
-- Task B: Vary the Cycle Time
-- Task C: Vary the Duty Cycle
+- [Task A:](p1/TaskA/project/Src/main.c) Blink an LED
+- [Task B:](p1/TaskB/project/Src/main.c) Vary the Cycle Time
+- [Task C:](p1/TaskC/project/Src/main.c) Vary the Duty Cycle
 - [Task D:](p1/TaskD/project/Src/main.c) Vary the Blinking Frequency with Push Buttons
 - [Task E:](p1/TaskE/project/Src/main.c) Display the Current Steps
 
