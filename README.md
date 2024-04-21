@@ -16,9 +16,9 @@ Networked Embedded Systems Practicum
 ## Practicum Execise 2
 
 - [Documentation](p2/docs/Practicum2_Group8.pdf)
-- [Task A:](p2/TaskA/project/Src/main.c)
-- [Task B:](p2/TaskB/project/Src/main.c)
-- [Task C:](p2/TaskC/project/Src/main.c)
+- [Task A:](p2/TaskA/project/Src/main.c) Blink an LED with Timer Module
+- [Task B:](p2/TaskB/project/Src/main.c) Vary the Brightness of an LED
+- [Task C:](p2/TaskC/project/Src/main.c) Count Pulses of a Blinking LED
 
 ## Practicum Execise 3
 
