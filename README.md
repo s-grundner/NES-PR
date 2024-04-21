@@ -2,6 +2,8 @@
 
 Networked Embedded Systems Practicum
 
+- [Build instructions](pdf/Instructions.pdf)
+
 ## Practicum Execise 1
 
 - [Documentation](p1/docs/Practicum1_Group8.pdf)
