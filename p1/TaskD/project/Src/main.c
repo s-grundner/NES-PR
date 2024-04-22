@@ -84,9 +84,9 @@ void PeriphCommonClock_Config(void);
 void USR_SEG_FlashDP(uint16_t period_ms, float dc)
 {
   HAL_GPIO_WritePin(SEGDP_GPIO_Port, SEGDP_Pin, GPIO_PIN_SET);
-  HAL_Delay(period_ms * dc);
+  HAL_Delay(period_ms * dc); // LED on time
   HAL_GPIO_WritePin(SEGDP_GPIO_Port, SEGDP_Pin, GPIO_PIN_RESET);
-  HAL_Delay(period_ms * (1.0f - dc));
+  HAL_Delay(period_ms * (1.0f - dc)); // LED off time
 }
 
 void USR_BTN_Init(Button_t* btn, GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
@@ -100,7 +100,7 @@ void USR_BTN_Init(Button_t* btn, GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin)
 void USR_BTN_Check(Button_t* btn)
 {
   GPIO_PinState curr = HAL_GPIO_ReadPin(btn->GPIOx, btn->GPIO_Pin);
-  btn->has_changed = (!curr && btn->prev);
+  btn->has_changed = (!btn->prev && curr); // Truth table for logical rising edge
   btn->prev = curr;
 }
 
@@ -204,9 +204,7 @@ int main(void)
     USR_BTN_Check(&step_dn);
     int8_t sgn = (step_up.has_changed - step_dn.has_changed);
 
-    // sgn = 1 if only step_up has changed,
-    // -1 if only step_dn has changed, 0 otherwise
-    if (sgn == 0) continue;
+    if (sgn == 0) continue; // None or both buttons pressed
 
     curr_period_ms += sgn * STEP_SIZE_MS;
     // Limit curr_period_ms to [MIN_PERIOD_MS, MAX_PERIOD_MS]
