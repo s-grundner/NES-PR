@@ -67,7 +67,6 @@ typedef struct {
 
 #define SEG_MAX_NUM (9)
 #define SEG_MIN_NUM (0)
-#define SEG_NUM_COUNT (SEG_MAX_NUM - SEG_MIN_NUM + 1)
 #define SEG_MASK (SEGA_Pin | SEGB_Pin | SEGC_Pin | SEGD_Pin | SEGE_Pin | SEGF_Pin | SEGG_Pin)
 
 /* USER CODE END PD */
