@@ -63,11 +63,7 @@ typedef struct {
 
 // safer macro for limiting a value to a range (due to feedback)
 
-#define LIMIT(x, min, max)  \
-  typeof(x) _x = (x);       \
-  typeof(min) _min = (min); \
-  typeof(max) _max = (max); \
-  ((_x < _min) ? _min : ((_x > _max) ? _max : _x))
+#define LIMIT(x, min, max)((x) < (min) ? (min) : (x) > (max) ? (max) : (x))
 
 /* USER CODE END PM */
 

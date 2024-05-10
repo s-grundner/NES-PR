@@ -74,7 +74,7 @@ typedef struct {
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
-#define LIMIT(x, min, max) ((x) < (min) ? (min) : (x) > (max) ? (max) : (x))
+#define LIMIT(x, min, max)((x) < (min) ? (min) : (x) > (max) ? (max) : (x))
 
 /* USER CODE END PM */
 
