@@ -1,4 +1,4 @@
-# [NES-PR](https://moodle.jku.at/jku/course/view.php?id=30269)
+# NES-PR
 
 Networked Embedded Systems Practicum
 
