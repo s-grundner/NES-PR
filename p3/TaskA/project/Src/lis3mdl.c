@@ -21,12 +21,17 @@ HAL_StatusTypeDef LIS3MDL_Init(LIS3MDL_HandleTypeDef *hlis3mdl, I2C_HandleTypeDe
 
 HAL_StatusTypeDef LIS3MDL_ReadRegister(LIS3MDL_HandleTypeDef *hlis3mdl, uint8_t reg, uint8_t *data)
 {
-	return HAL_I2C_Mem_Read(hlis3mdl->hi2c, hlis3mdl->address, reg, 1, data, 1, I2C_TIMEOUT);
+	return HAL_I2C_Mem_Read(hlis3mdl->hi2c, hlis3mdl->address, reg, I2C_MEMADD_SIZE_8BIT, data, 1, I2C_TIMEOUT);
+}
+
+HAL_StatusTypeDef LIS3MDL_ReadRegisters(LIS3MDL_HandleTypeDef *hlis3mdl, uint8_t reg, uint8_t *data, uint16_t size)
+{
+	return HAL_I2C_Mem_Read(hlis3mdl->hi2c, hlis3mdl->address, reg, I2C_MEMADD_SIZE_8BIT, data, size, I2C_TIMEOUT);
 }
 
 HAL_StatusTypeDef LIS3MDL_WriteRegister(LIS3MDL_HandleTypeDef *hlis3mdl, uint8_t reg, uint8_t data)
 {
-	return HAL_I2C_Mem_Write(hlis3mdl->hi2c, hlis3mdl->address, reg, 1, &data, 1, I2C_TIMEOUT);
+	return HAL_I2C_Mem_Write(hlis3mdl->hi2c, hlis3mdl->address, reg, I2C_MEMADD_SIZE_8BIT, &data, 1, I2C_TIMEOUT);
 }
 
 // Read / Write Specific Registers
@@ -40,7 +45,7 @@ HAL_StatusTypeDef LIS3MDL_ReadXYZ(LIS3MDL_HandleTypeDef *hlis3mdl)
 {
 	// Burst read 6 bytes starting from OUT_X_L
 	uint8_t data[6] = {0};
-	HAL_StatusTypeDef err = HAL_I2C_Mem_Read(hlis3mdl->hi2c, hlis3mdl->address, LIS3MDL_OUT_X_L, 1, data, 6, I2C_TIMEOUT);
+	HAL_StatusTypeDef err = LIS3MDL_ReadRegisters(hlis3mdl, LIS3MDL_OUT_X_L, data, 6);
 
 	if (err != HAL_OK)
 	{
