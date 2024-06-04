@@ -156,7 +156,7 @@ int main(void)
 
   err_cnt += HTS221_Init(&hhts221, &hi2c2, HTS221_SAD) != HAL_OK;
 
-  uint8_t tx_buf[23] = { 0 };
+  char tx_buf[23] = { 0 };
   char* sensor_msg = "Temperature: %2d.%1d degC\n";
 
   /* USER CODE END 2 */
@@ -177,8 +177,8 @@ int main(void)
       err_cnt += HTS221_ReadTemperature(&hhts221) != HAL_OK;
 
       // Transmit tempearture data via UART
-      sprintf((char*)tx_buf, sensor_msg, hhts221.temperature / 10, hhts221.temperature % 10);
-      err_cnt += HAL_UART_Transmit(&huart4, tx_buf, sizeof(tx_buf), HAL_MAX_DELAY) != HAL_OK;
+      sprintf(tx_buf, sensor_msg, hhts221.temperature / 10, hhts221.temperature % 10);
+      err_cnt += HAL_UART_Transmit(&huart4, (uint8_t*)tx_buf, sizeof(tx_buf), HAL_MAX_DELAY) != HAL_OK;
       memset(tx_buf, 0, sizeof(tx_buf));
       HAL_Delay(200);
     }

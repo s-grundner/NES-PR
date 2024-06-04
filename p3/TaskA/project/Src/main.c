@@ -159,7 +159,7 @@ int main(void)
 
   err_cnt += LIS3MDL_Init(&hlis3mdl, &hi2c2, LIS3MDL_SAD) != HAL_OK;
 
-  unsigned char tx_buf[47] = { 0 };
+  char tx_buf[50] = { 0 };
   const char* sensor_msg = "X: %5d Gauss, Y: %5d Gauss, Z: %5d Gauss\n";
 
   /* USER CODE END 2 */
@@ -179,8 +179,8 @@ int main(void)
       err_cnt += LIS3MDL_ReadXYZ(&hlis3mdl) != HAL_OK;
 
       // Transmit Gyroscope Data via UART
-      sprintf((char*)tx_buf, sensor_msg, hlis3mdl.x, hlis3mdl.y, hlis3mdl.z);
-      err_cnt += HAL_UART_Transmit(&huart4, tx_buf, sizeof(tx_buf), UART_TIMEOUT) != HAL_OK;
+      sprintf(tx_buf, sensor_msg, hlis3mdl.x, hlis3mdl.y, hlis3mdl.z);
+      err_cnt += HAL_UART_Transmit(&huart4, (uint8_t*)tx_buf, sizeof(tx_buf), UART_TIMEOUT) != HAL_OK;
       memset(tx_buf, 0, sizeof(tx_buf));
       HAL_Delay(200);
     }

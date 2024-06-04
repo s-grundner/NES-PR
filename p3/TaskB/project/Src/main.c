@@ -156,7 +156,7 @@ int main(void)
 
   err_cnt += HTS221_Init(&hhts221, &hi2c2, HTS221_SAD) != HAL_OK;
 
-  uint8_t tx_buf[25] = { 0 }; // Max transmission length = 100
+  char tx_buf[50] = { 0 }; // Max transmission length = 100
   char* sensor_msg = "Relative Humidity: %2d.%1d%%\n";
 
   /* USER CODE END 2 */
@@ -177,8 +177,8 @@ int main(void)
       err_cnt += HTS221_ReadHumidity(&hhts221) != HAL_OK;
 
       // Transmit humidity data via UART
-      sprintf((char*)tx_buf, sensor_msg, hhts221.humidity / 10, hhts221.humidity % 10);
-      err_cnt += HAL_UART_Transmit(&huart4, tx_buf, sizeof(tx_buf), HAL_MAX_DELAY) != HAL_OK;
+      sprintf(tx_buf, sensor_msg, hhts221.humidity / 10, hhts221.humidity % 10);
+      err_cnt += HAL_UART_Transmit(&huart4, (uint8_t*)tx_buf, sizeof(tx_buf), HAL_MAX_DELAY) != HAL_OK;
       memset(tx_buf, 0, sizeof(tx_buf));
       HAL_Delay(200);
     }
