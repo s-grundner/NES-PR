@@ -2,7 +2,7 @@
 /**
   ******************************************************************************
   * @file           : main.c
-  * @brief          : Main program body
+  * @brief          : Task B: Read Humidity Values from the HTS221 Sensor
   ******************************************************************************
   * @attention
   *
@@ -35,6 +35,8 @@
 /* USER CODE BEGIN Includes */
 
 #include "hts221.h"
+#include "string.h"
+#include "stdio.h"
 
 /* USER CODE END Includes */
 
@@ -154,8 +156,8 @@ int main(void)
 
   err_cnt += HTS221_Init(&hhts221, &hi2c2, HTS221_SAD) != HAL_OK;
 
-  char tx_buf[100] = { 0 }; // Max transmission length = 100
-  char* sensor_msg = "Temp: %d°C\n";
+  uint8_t tx_buf[23] = { 0 };
+  char* sensor_msg = "Temperature: %2d.%1d degC\n";
 
   /* USER CODE END 2 */
 
@@ -169,18 +171,19 @@ int main(void)
 
     err_cnt += HTS221_ReadStatus(&hhts221);
 
-    if (hhts221.status & T_DA) // Check if humidity data is available
+    if (hhts221.status & T_DA) // Check if temperature data is available
     {
-      // H_DA Bit is cleared after reading humidity data
+      // T_DA Bit is cleared after reading humidity data
       err_cnt += HTS221_ReadTemperature(&hhts221) != HAL_OK;
 
-      // Transmit humidity data via UART
-      sprintf(tx_buf, sensor_msg, hhts221.temperature);
-      err_cnt += HAL_UART_Transmit(&huart2, (uint8_t*)tx_buf, strlen(tx_buf), HAL_MAX_DELAY) != HAL_OK;
+      // Transmit tempearture data via UART
+      sprintf((char*)tx_buf, sensor_msg, hhts221.temperature / 10, hhts221.temperature % 10);
+      err_cnt += HAL_UART_Transmit(&huart4, tx_buf, sizeof(tx_buf), HAL_MAX_DELAY) != HAL_OK;
       memset(tx_buf, 0, sizeof(tx_buf));
+      HAL_Delay(200);
     }
-
   }
+
   /* USER CODE END 3 */
 }
 

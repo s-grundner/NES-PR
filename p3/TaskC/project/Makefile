@@ -37,6 +37,7 @@ BUILD_DIR = build
 # C sources
 C_SOURCES =  \
 Src/main.c \
+Src/hts221.c \
 Src/gpio.c \
 Src/adc.c \
 Src/dac.c \
