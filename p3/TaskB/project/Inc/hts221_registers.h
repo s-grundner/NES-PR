@@ -6,7 +6,7 @@
 
 #define HTS221_CTRL_REG1 0x20
 #define ODR0 (1 << 1) // Output Data Rate
-#define PD (1 << 8) // Power Down
+#define PD (1 << 7) // Power Down
 
 #define HTS221_STATUS_REG 0x27
 #define T_DA (1 << 0) // Temperature Data Available

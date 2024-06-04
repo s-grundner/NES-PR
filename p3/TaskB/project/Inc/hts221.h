@@ -13,14 +13,14 @@
 #include "i2c.h"
 
 typedef struct {
-	int16_t H0_rH;
-	int16_t H1_rH;
+	uint8_t H0_rH;
+	uint8_t H1_rH;
 
 	int16_t H0_T0_out;
 	int16_t H1_T0_out;
 
-	int16_t T0_degC;
-	int16_t T1_degC;
+	uint8_t T0_degC;
+	uint8_t T1_degC;
 
 	int16_t T0_out;
 	int16_t T1_out;
@@ -31,7 +31,7 @@ typedef struct {
 	uint8_t address;
 	uint8_t status;
 	int16_t temperature; // in °C
-	int16_t humidity; // in % (Relative)
+	uint16_t humidity; // in % (Relative)
 	HTS221_CalibrationTypeDef cal;
 } HTS221_HandleTypeDef;
 
