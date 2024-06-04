@@ -1,5 +1,14 @@
+/**
+ * @file hts221_registers.h
+ * @author @s-grundner
+ * @brief HTS221 Register Definitions
+ * @date 2024-06-04
+ */
+
 #ifndef HTS221_REGISTERS_H
 #define HTS221_REGISTERS_H
+
+ // --- HTS221 Registers ---
 
 #define HTS221_WHO_AM_I 0x0F
 #define HTS221_WHO_AM_I_VAL 0xBC
@@ -18,7 +27,7 @@
 #define HTS221_TEMP_OUT_L 0x2A
 #define HTS221_TEMP_OUT_H 0x2B
 
-// Calibration Registers
+ // Calibration Registers
 
 #define HTS221_H0_rH_x2 0x30
 #define HTS221_H1_rH_x2 0x31

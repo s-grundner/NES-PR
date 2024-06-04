@@ -57,12 +57,8 @@ HAL_StatusTypeDef HTS221_ReadRegister(HTS221_HandleTypeDef* hhts221, uint8_t reg
 
 HAL_StatusTypeDef HTS221_ReadRegisters(HTS221_HandleTypeDef* hhts221, uint8_t reg, uint8_t* data, uint16_t size)
 {
-	for (uint16_t i = 0; i < size; i++)
-	{
-		if (HTS221_ReadRegister(hhts221, reg + i, data + i) != HAL_OK) return HAL_ERROR;
-	}
-	return HAL_OK;
-	// return HAL_I2C_Mem_Read(hhts221->hi2c, hhts221->address, reg, I2C_MEMADD_SIZE_8BIT, data, size, I2C_TIMEOUT);
+	// Set MSB to 1 (or with 0x80) for auto-increment Register
+	return HAL_I2C_Mem_Read(hhts221->hi2c, hhts221->address, 0x80 | reg, I2C_MEMADD_SIZE_8BIT, data, size, I2C_TIMEOUT);
 }
 
 HAL_StatusTypeDef HTS221_WriteRegister(HTS221_HandleTypeDef* hhts221, uint8_t reg, uint8_t data)
