@@ -1,0 +1,11 @@
+{
+	"files.associations": {
+		".fantomasignore": "ignore",
+		"lis3mdl.h": "c",
+		"i2c.h": "c",
+		"main.h": "c",
+		"lis3mdl_registers.h": "c",
+		"stm32h7xx_hal.h": "c",
+		"string.h": "c"
+	}
+}

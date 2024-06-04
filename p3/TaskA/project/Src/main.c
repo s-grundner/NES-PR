@@ -2,7 +2,7 @@
 /**
  ******************************************************************************
  * @file           : main.c
- * @brief          : Main program body
+ * @brief          : Task A: Read Data from the LIS3MDL Magnetic Sensor
  ******************************************************************************
  * @attention
  *
@@ -15,8 +15,8 @@
  *
  ******************************************************************************
  */
-/* USER CODE END Header */
-/* Includes ------------------------------------------------------------------*/
+ /* USER CODE END Header */
+ /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
 #include "dac.h"
@@ -35,6 +35,9 @@
 /* USER CODE BEGIN Includes */
 
 #include "lis3mdl.h"
+#include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
 
 /* USER CODE END Includes */
 
@@ -46,8 +49,9 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-#define LIS3MDL_SAD 0b0011100 // 7-Bit Magnetometer Address
-#define UART_TIMEOUT 200
+// Slave Address with SA1 = 1, Shifted Left by 1 for Read / Write Bit
+#define LIS3MDL_SAD (0b0011110 << 1) 
+#define UART_TIMEOUT HAL_MAX_DELAY
 
 /* USER CODE END PD */
 
@@ -75,15 +79,15 @@ void PeriphCommonClock_Config(void);
 /* USER CODE END 0 */
 
 /**
- * @brief  The application entry point.
- * @retval int
- */
+  * @brief  The application entry point.
+  * @retval int
+  */
 int main(void)
 {
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
-  /* Enable the CPU Cache */
+/* Enable the CPU Cache */
 
   /* Enable I-Cache---------------------------------------------------------*/
   SCB_EnableICache();
@@ -150,13 +154,14 @@ int main(void)
   MX_USB_OTG_FS_USB_Init();
   /* USER CODE BEGIN 2 */
 
+  uint32_t err_cnt = 0; // Debug Variable to Count Errors
   LIS3MDL_HandleTypeDef hlis3mdl;
-  uint8_t err_cnt = 0; // Debug Variable to Count Errors
 
   err_cnt += LIS3MDL_Init(&hlis3mdl, &hi2c2, LIS3MDL_SAD) != HAL_OK;
 
-  char tx_buf[100] = {0}; // Max Transmission Len = 100
-  char *sensor_msg = "X: %4d Gauss, Y: %4d Gauss, Z: %4d Gauss\n";
+  unsigned char tx_buf[47] = { 0 };
+  const char* sensor_msg = "X: %5d Gauss, Y: %5d Gauss, Z: %5d Gauss\n";
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -167,55 +172,46 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-    // Read Status Register
     err_cnt += LIS3MDL_ReadStatus(&hlis3mdl) != HAL_OK;
 
-    if (hlis3mdl.status & 0x03) // Check if XYZ data is ready
+    if (hlis3mdl.status & ZYXDA) // Check if data is available on all axes
     {
-      // Read Magnetometer Data
       err_cnt += LIS3MDL_ReadXYZ(&hlis3mdl) != HAL_OK;
 
-      // Clear status register
-      err_cnt += LIS3MDL_WriteStatusRegister(&hlis3mdl, ~(hlis3mdl.status & 0x03)) != HAL_OK;
-
-      // Transmit data via UART
-      sprintf(tx_buf, sensor_msg, hlis3mdl.x, hlis3mdl.y, hlis3mdl.z);
+      // Transmit Gyroscope Data via UART
+      sprintf((char*)tx_buf, sensor_msg, hlis3mdl.x, hlis3mdl.y, hlis3mdl.z);
       err_cnt += HAL_UART_Transmit(&huart4, tx_buf, sizeof(tx_buf), UART_TIMEOUT) != HAL_OK;
       memset(tx_buf, 0, sizeof(tx_buf));
+      HAL_Delay(200);
     }
   }
   /* USER CODE END 3 */
 }
 
 /**
- * @brief System Clock Configuration
- * @retval None
- */
+  * @brief System Clock Configuration
+  * @retval None
+  */
 void SystemClock_Config(void)
 {
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_OscInitTypeDef RCC_OscInitStruct = { 0 };
+  RCC_ClkInitTypeDef RCC_ClkInitStruct = { 0 };
 
   /** Supply configuration update enable
-   */
+  */
   HAL_PWREx_ConfigSupply(PWR_LDO_SUPPLY);
 
   /** Configure the main internal regulator output voltage
-   */
+  */
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
 
-  while (!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY))
-  {
-  }
-
-  /** Macro to configure the PLL clock source
-   */
-  __HAL_RCC_PLL_PLLSOURCE_CONFIG(RCC_PLLSOURCE_HSE);
+  while (!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {}
 
   /** Initializes the RCC Oscillators according to the specified parameters
-   * in the RCC_OscInitTypeDef structure.
-   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48 | RCC_OSCILLATORTYPE_LSI | RCC_OSCILLATORTYPE_HSE;
+  * in the RCC_OscInitTypeDef structure.
+  */
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48 | RCC_OSCILLATORTYPE_LSI
+    | RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
   RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
@@ -235,8 +231,10 @@ void SystemClock_Config(void)
   }
 
   /** Initializes the CPU, AHB and APB buses clocks
-   */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2 | RCC_CLOCKTYPE_D3PCLK1 | RCC_CLOCKTYPE_D1PCLK1;
+  */
+  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK
+    | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2
+    | RCC_CLOCKTYPE_D3PCLK1 | RCC_CLOCKTYPE_D1PCLK1;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.SYSCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_HCLK_DIV1;
@@ -252,15 +250,15 @@ void SystemClock_Config(void)
 }
 
 /**
- * @brief Peripherals Common Clock Configuration
- * @retval None
- */
+  * @brief Peripherals Common Clock Configuration
+  * @retval None
+  */
 void PeriphCommonClock_Config(void)
 {
-  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = { 0 };
 
   /** Initializes the peripherals clock
-   */
+  */
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_ADC;
   PeriphClkInitStruct.PLL2.PLL2M = 1;
   PeriphClkInitStruct.PLL2.PLL2N = 9;
@@ -282,9 +280,9 @@ void PeriphCommonClock_Config(void)
 /* USER CODE END 4 */
 
 /**
- * @brief  This function is executed in case of error occurrence.
- * @retval None
- */
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
@@ -296,19 +294,19 @@ void Error_Handler(void)
   /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef USE_FULL_ASSERT
+#ifdef  USE_FULL_ASSERT
 /**
- * @brief  Reports the name of the source file and the source line number
- *         where the assert_param error has occurred.
- * @param  file: pointer to the source file name
- * @param  line: assert_param error line source number
- * @retval None
- */
-void assert_failed(uint8_t *file, uint32_t line)
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
+void assert_failed(uint8_t* file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
      ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-  /* USER CODE END 6 */
+     /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
