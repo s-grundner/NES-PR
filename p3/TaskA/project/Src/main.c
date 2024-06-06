@@ -51,7 +51,6 @@
 
 // Slave Address with SA1 = 1, Shifted Left by 1 for Read / Write Bit
 #define LIS3MDL_SAD (0b0011110 << 1) 
-#define UART_TIMEOUT HAL_MAX_DELAY
 
 /* USER CODE END PD */
 
@@ -180,7 +179,7 @@ int main(void)
 
       // Transmit Gyroscope Data via UART
       sprintf(tx_buf, sensor_msg, hlis3mdl.x, hlis3mdl.y, hlis3mdl.z);
-      err_cnt += HAL_UART_Transmit(&huart4, (uint8_t*)tx_buf, sizeof(tx_buf), UART_TIMEOUT) != HAL_OK;
+      err_cnt += HAL_UART_Transmit(&huart4, (uint8_t*)tx_buf, sizeof(tx_buf), HAL_MAX_DELAY) != HAL_OK;
       memset(tx_buf, 0, sizeof(tx_buf));
       HAL_Delay(200);
     }

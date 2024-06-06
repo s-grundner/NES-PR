@@ -25,7 +25,7 @@ HAL_StatusTypeDef LIS3MDL_Init(LIS3MDL_HandleTypeDef* hlis3mdl, I2C_HandleTypeDe
 	return HAL_OK;
 }
 
-// Read / Write General Purpose Registers
+// Read / Write Generic Registers
 
 HAL_StatusTypeDef LIS3MDL_ReadRegister(LIS3MDL_HandleTypeDef* hlis3mdl, uint8_t reg, uint8_t* data)
 {
@@ -47,11 +47,6 @@ HAL_StatusTypeDef LIS3MDL_WriteRegister(LIS3MDL_HandleTypeDef* hlis3mdl, uint8_t
 HAL_StatusTypeDef LIS3MDL_ReadStatus(LIS3MDL_HandleTypeDef* hlis3mdl)
 {
 	return LIS3MDL_ReadRegister(hlis3mdl, LIS3MDL_STATUS_REG, &hlis3mdl->status);
-}
-
-HAL_StatusTypeDef LIS3MDL_WriteStatus(LIS3MDL_HandleTypeDef* hlis3mdl, uint8_t status)
-{
-	return LIS3MDL_WriteRegister(hlis3mdl, LIS3MDL_STATUS_REG, status);
 }
 
 HAL_StatusTypeDef LIS3MDL_ReadXYZ(LIS3MDL_HandleTypeDef* hlis3mdl)
