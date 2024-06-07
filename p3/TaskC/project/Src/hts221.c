@@ -2,25 +2,11 @@
 
 #define I2C_TIMEOUT HAL_MAX_DELAY
 
-// --- HTS221 Functions ---
-// Initialize
+// === HTS221 Functions 
+// --- Private Functions ---
 
-HAL_StatusTypeDef HTS221_Init(HTS221_HandleTypeDef* hhts221, I2C_HandleTypeDef* hi2c, uint8_t address)
+HAL_StatusTypeDef __HTS221_Get_Calibration(HTS221_HandleTypeDef* hhts221)
 {
-	hhts221->hi2c = hi2c;
-	hhts221->address = address;
-	hhts221->status = 0;
-	hhts221->temperature = 0;
-	hhts221->humidity = 0;
-
-	// Check if Sensor is connected
-	uint8_t who_am_i;
-	if (HTS221_ReadRegister(hhts221, HTS221_WHO_AM_I, &who_am_i)) return HAL_ERROR;
-	if (who_am_i != HTS221_WHO_AM_I_VAL) return HAL_ERROR;
-
-	// Configure Sensor
-	if (HTS221_WriteRegister(hhts221, HTS221_CTRL_REG1, ODR0 | PD) != HAL_OK) return HAL_ERROR;
-
 	// Read Calibration Values
 	uint8_t i2c_buf[4], t_msb; // Temporary buffer for I2C data
 
@@ -44,6 +30,29 @@ HAL_StatusTypeDef HTS221_Init(HTS221_HandleTypeDef* hhts221, I2C_HandleTypeDef* 
 	if (HTS221_ReadRegisters(hhts221, HTS221_T0_OUT_L, i2c_buf, 4) != HAL_OK) return HAL_ERROR;
 	hhts221->cal.T0_out = ((uint16_t)i2c_buf[1] << 8 | i2c_buf[0]);
 	hhts221->cal.T1_out = ((uint16_t)i2c_buf[3] << 8 | i2c_buf[2]);
+
+	return HAL_OK;
+}
+
+// --- Public Functions ---
+// Initialize
+
+HAL_StatusTypeDef HTS221_Init(HTS221_HandleTypeDef* hhts221, I2C_HandleTypeDef* hi2c, uint8_t address)
+{
+	hhts221->hi2c = hi2c;
+	hhts221->address = address;
+	hhts221->status = 0;
+	hhts221->temperature = 0;
+	hhts221->humidity = 0;
+
+	// Check if Sensor is connected
+	uint8_t who_am_i;
+	if (HTS221_ReadRegister(hhts221, HTS221_WHO_AM_I, &who_am_i)) return HAL_ERROR;
+	if (who_am_i != HTS221_WHO_AM_I_VAL) return HAL_ERROR;
+
+	// Configure Sensor
+	if (HTS221_WriteRegister(hhts221, HTS221_CTRL_REG1, ODR0 | PD) != HAL_OK) return HAL_ERROR;
+	if (__HTS221_Get_Calibration(hhts221) != HAL_OK) return HAL_ERROR;
 
 	return HAL_OK;
 }
