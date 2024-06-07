@@ -53,9 +53,9 @@ HAL_StatusTypeDef LIS3MDL_Init(LIS3MDL_HandleTypeDef* hlis3mdl, I2C_HandleTypeDe
 	// Configure device
 	uint8_t cfg_data[4] = {
 		DO_5HZ | OM_UHP | TEMP_EN, 	// CTRL_REG1
-		FS_12GAUSS, 				// CTRL_REG2
-		MD_CONTINUOUS, 				// CTRL_REG3
-		OMZ_UHP 					// CTRL_REG4
+		FS_12GAUSS, 			// CTRL_REG2
+		MD_CONTINUOUS, 			// CTRL_REG3
+		OMZ_UHP 			// CTRL_REG4
 	};
 
 	// Write configuration data to control registers 1 to 4
