@@ -88,7 +88,7 @@ HAL_StatusTypeDef HTS221_ReadTemperature(HTS221_HandleTypeDef* hhts221)
 
 	// Burst read temperature registers (Status Register is cleared automatically)
 	if (HTS221_ReadRegisters(hhts221, HTS221_TEMP_OUT_L, data, 2) != HAL_OK) return HAL_ERROR;
-	uint16_t t_out = ((int16_t)data[1] << 8 | (int16_t)data[0]);
+	uint16_t t_out = ((int16_t)data[1] << 8 | data[0]);
 
 	// Interpolate temperature using formula (2) from the Technical Note [TN1218, p. 6]
 	// Multiply by 10 to get one decimal place
@@ -104,7 +104,7 @@ HAL_StatusTypeDef HTS221_ReadHumidity(HTS221_HandleTypeDef* hhts221)
 
 	// Burst read humidity registers (Status Register is cleared automatically)
 	if (HTS221_ReadRegisters(hhts221, HTS221_TEMP_OUT_L, data, 2) != HAL_OK) return HAL_ERROR;
-	int16_t h_out = ((int16_t)data[1] << 8 | (int16_t)data[0]);
+	int16_t h_out = ((int16_t)data[1] << 8 | data[0]);
 
 	// Interpolate humidity using formula (1) from the Technical Note [TN1218, p. 2]
 	int32_t tmp32 = (int32_t)(h_out - hhts221->cal.H0_T0_out) * (int32_t)(hhts221->cal.H1_rH - hhts221->cal.H0_rH);
