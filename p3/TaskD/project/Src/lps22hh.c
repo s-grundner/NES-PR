@@ -18,9 +18,9 @@ HAL_StatusTypeDef LPS22HH_Init(LPS22HH_HandleTypeDef* hlps22hh, I2C_HandleTypeDe
 {
 	hlps22hh->i2c = hi2c;
 	hlps22hh->address = address;
-	hlps22hh->status = 0.0f;
-	hlps22hh->pressure = 0.0f;
-	hlps22hh->temp = 0.0f;
+	hlps22hh->status = 0;
+	hlps22hh->pressure = 0;
+	hlps22hh->temp = 0;
 
 	// Check WHO_AM_I Register
 	uint8_t who_am_i = 0;

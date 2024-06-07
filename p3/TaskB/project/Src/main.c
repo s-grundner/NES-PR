@@ -156,7 +156,7 @@ int main(void)
 
   err_cnt += HTS221_Init(&hhts221, &hi2c2, HTS221_SAD) != HAL_OK;
 
-  char tx_buf[50] = { 0 }; // Max transmission length = 100
+  char tx_buf[25] = { 0 };
   char* sensor_msg = "Relative Humidity: %2d.%1d%%\n";
 
   /* USER CODE END 2 */

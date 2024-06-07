@@ -22,22 +22,25 @@
 #define TEMP_EN (1 << 7) 			
 
 #define OM_UHP (OM0 | OM1) 			// Ultra-high performance mode (XY)
+#define DO_5HZ (DO0 | DO1) 				// 5 Hz output data rate
 #define DO_80HZ (DO0 | DO1 | DO2) 	// 80 Hz output data rate
 
 // Control register 2
 #define LIS3MDL_CTRL_REG2 0x21
 // Full scale Bits
-#define FS0 (1 << 5)
+#define FS0_BIT 5
+// Full scale Masks
+#define FS0 (1 << FS0_BIT)
 #define FS1 (1 << 6)
 
 #define FS_4GAUSS (0)			// ± 4 Gauss Sensitivity
 #define FS_8GAUSS (FS0) 		// ± 8 Gauss Sensitivity
 #define FS_12GAUSS (FS1)   		// ±12 Gauss Sensitivity
-#define FS_16GAUSS (FS0 | FS1) 	// ±16 Gauss Sensitivity
+#define FS_16GAUSS (FS0 | FS1) 	// ±16 Gauss Sensitivity and FS-Mask
 
 // Control register 3
 #define LIS3MDL_CTRL_REG3 0x22
-// Mode selection Bits
+// Mode selection Masks
 #define MD0 (1 << 0) 
 #define MD1 (1 << 1)
 
@@ -45,7 +48,7 @@
 
 // Control register 4
 #define LIS3MDL_CTRL_REG4 0x23
-// Operating mode Bits (Z)
+// Operating mode Masks (Z)
 #define OMZ0 (1 << 2)
 #define OMZ1 (1 << 3)
 

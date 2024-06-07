@@ -153,13 +153,13 @@ int main(void)
   MX_USB_OTG_FS_USB_Init();
   /* USER CODE BEGIN 2 */
 
-  uint32_t err_cnt = 0; // Debug Variable to Count Errors
+  volatile uint32_t err_cnt = 0; // Debug Variable to Count Errors
   LIS3MDL_HandleTypeDef hlis3mdl;
 
   err_cnt += LIS3MDL_Init(&hlis3mdl, &hi2c2, LIS3MDL_SAD) != HAL_OK;
 
-  char tx_buf[50] = { 0 };
-  const char* sensor_msg = "X: %5d Gauss, Y: %5d Gauss, Z: %5d Gauss\n";
+  char tx_buf[45] = { 0 };
+  const char* sensor_msg = "X: %6d mGs, Y: %6d mGs, Z: %6d mGs\n";
 
   /* USER CODE END 2 */
 
