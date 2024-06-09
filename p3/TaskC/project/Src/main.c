@@ -180,7 +180,6 @@ int main(void)
       sprintf(tx_buf, sensor_msg, hhts221.temperature / 10, hhts221.temperature % 10);
       err_cnt += HAL_UART_Transmit(&huart4, (uint8_t*)tx_buf, sizeof(tx_buf), HAL_MAX_DELAY) != HAL_OK;
       memset(tx_buf, 0, sizeof(tx_buf));
-      HAL_Delay(200);
     }
   }
 
