@@ -20,10 +20,10 @@
                     "att 1",
                     "load"
                 ] /*activate srst and reattach+load*/
-            },
+            },          
             "windows": {
                 "armToolchainPath": "${env:ELITEBOARDDIR}",
-                "BMPGDBSerialPort": "\\\\.\\COM5", /*If any of your ports are 10 or over, use this format: \\.\COM10*/
+                "BMPGDBSerialPort": "\\\\.\\COM3", /*If any of your ports are 10 or over, use this format: \\.\COM10*/
                 "preLaunchCommands": [
                     "mon connect_srst enable",
                     "mon hard_srst",
