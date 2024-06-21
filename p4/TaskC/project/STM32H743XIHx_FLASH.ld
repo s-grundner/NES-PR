@@ -174,7 +174,7 @@ SECTIONS
     PROVIDE ( _end = . );
     . = . + _Min_Heap_Size;
     . = . + _Min_Stack_Size;
-    _estack = .;        /* define a global symbol for the top of user stack */
+    _estack = .;        /* define a global symbol at stack end */
     . = ALIGN(8);
   } >RAM_D1
 
