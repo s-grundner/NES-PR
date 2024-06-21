@@ -59,10 +59,12 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 #define BTN1_Pin GPIO_PIN_12
 #define BTN1_GPIO_Port GPIOJ
+#define BTN1_EXTI_IRQn EXTI15_10_IRQn
 #define CDET_Pin GPIO_PIN_13
 #define CDET_GPIO_Port GPIOC
 #define BTN2_Pin GPIO_PIN_13
 #define BTN2_GPIO_Port GPIOJ
+#define BTN2_EXTI_IRQn EXTI15_10_IRQn
 #define SEGA_Pin GPIO_PIN_0
 #define SEGA_GPIO_Port GPIOJ
 #define SEGDP_Pin GPIO_PIN_7
