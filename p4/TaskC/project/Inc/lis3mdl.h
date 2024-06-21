@@ -36,6 +36,5 @@ HAL_StatusTypeDef LIS3MDL_ReadXYZ(LIS3MDL_HandleTypeDef *hlis3mdl);
 HAL_StatusTypeDef LIS3MDL_ReadStatus(LIS3MDL_HandleTypeDef *hlis3mdl);
 
 HAL_StatusTypeDef LIS3MDL_ReadXYZ_IT(LIS3MDL_HandleTypeDef *hlis3mdl);
-HAL_StatusTypeDef LIS3MDL_ReadStatus_IT(LIS3MDL_HandleTypeDef *hlis3mdl);
 
 #endif // #ifndef LIS3MDL
