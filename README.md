@@ -31,3 +31,8 @@ Networked Embedded Systems Practicum
 ## Practicum Execise 4 - [Interrupts](p4/docs/Practicum4_TaskSheet.pdf)
 
 - [Documentation](p4/docs/P4_Group8.pdf)
+- [Task A:](p4/TaskA/project/Src/main.c) Blink an LED with External Interrupts
+- [Task B:](p4/TaskB/project/Src/main.c) Blink an LED using Non-Blocking DMA and Timer Interrupts
+- [Task C:](p4/TaskC/project/Src/main.c) Read Magnetic Data from LIS3MDL Sensor in NonBlocking Mode using Interrupts
+- [Task D:](p4/TaskD/project/Src/main.c) Read Magnetic Data from LIS3MDL Sensor in NonBlocking Mode using DMA
+
