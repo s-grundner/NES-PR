@@ -106,11 +106,6 @@ HAL_StatusTypeDef LIS3MDL_WriteRegister(LIS3MDL_HandleTypeDef *hlis3mdl, uint8_t
 
 // Read / Write Registers with Interrupts
 
-HAL_StatusTypeDef LIS3MDL_ReadRegister_IT(LIS3MDL_HandleTypeDef *hlis3mdl, uint8_t reg, uint8_t *data)
-{
-	return HAL_I2C_Mem_Read_IT(hlis3mdl->hi2c, hlis3mdl->address, reg, I2C_MEMADD_SIZE_8BIT, data, 1);
-}
-
 HAL_StatusTypeDef LIS3MDL_ReadRegisters_IT(LIS3MDL_HandleTypeDef *hlis3mdl, uint8_t reg, uint8_t *data, uint16_t size)
 {
 	return HAL_I2C_Mem_Read_IT(hlis3mdl->hi2c, hlis3mdl->address, reg, I2C_MEMADD_SIZE_8BIT, data, size);
