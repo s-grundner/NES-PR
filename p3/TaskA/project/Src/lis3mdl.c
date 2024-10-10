@@ -5,11 +5,12 @@
 // === LIS3MDL Functions ===
 // --- Private Functions ---
 
-HAL_StatusTypeDef __LIS3MDL_Set_Sensitivity(LIS3MDL_HandleTypeDef* hlis3mdl)
+HAL_StatusTypeDef __LIS3MDL_Set_Sensitivity(LIS3MDL_HandleTypeDef *hlis3mdl)
 {
 	// Set the sensitivity based on the full scale range
 	uint8_t fs_data = 0;
-	if (LIS3MDL_ReadRegister(hlis3mdl, LIS3MDL_CTRL_REG2, &fs_data) != HAL_OK) return HAL_ERROR;
+	if (LIS3MDL_ReadRegister(hlis3mdl, LIS3MDL_CTRL_REG2, &fs_data) != HAL_OK)
+		return HAL_ERROR;
 
 	fs_data &= FS_16GAUSS; // Mask out the FS bits
 
@@ -35,7 +36,7 @@ HAL_StatusTypeDef __LIS3MDL_Set_Sensitivity(LIS3MDL_HandleTypeDef* hlis3mdl)
 // --- Public Functions ---
 // Initialization
 
-HAL_StatusTypeDef LIS3MDL_Init(LIS3MDL_HandleTypeDef* hlis3mdl, I2C_HandleTypeDef* hi2c, uint8_t address)
+HAL_StatusTypeDef LIS3MDL_Init(LIS3MDL_HandleTypeDef *hlis3mdl, I2C_HandleTypeDef *hi2c, uint8_t address)
 {
 	hlis3mdl->hi2c = hi2c;
 	hlis3mdl->address = address;
@@ -46,61 +47,66 @@ HAL_StatusTypeDef LIS3MDL_Init(LIS3MDL_HandleTypeDef* hlis3mdl, I2C_HandleTypeDe
 
 	// Check if the device is connected
 	uint8_t whoami = 0;
-	HAL_I2C_MemRead(hlis3mdl->hi2c, hlis3mdl->address, LIS3MDL_WHO_AM_I, I2C_MEMADD_SIZE_8BIT, &whoami, 1, I2C_TIMEOUT);
-	if (LIS3MDL_ReadRegister(hlis3mdl, LIS3MDL_WHO_AM_I, &whoami) != HAL_OK) return HAL_ERROR;
-	if (whoami != LIS3MDL_WHO_AM_I_VALUE) return HAL_ERROR;
+	HAL_I2C_Mem_Read(hlis3mdl->hi2c, hlis3mdl->address, LIS3MDL_WHO_AM_I, I2C_MEMADD_SIZE_8BIT, &whoami, 1, I2C_TIMEOUT);
+	if (LIS3MDL_ReadRegister(hlis3mdl, LIS3MDL_WHO_AM_I, &whoami) != HAL_OK)
+		return HAL_ERROR;
+	if (whoami != LIS3MDL_WHO_AM_I_VALUE)
+		return HAL_ERROR;
 
 	// Configure device
 	uint8_t cfg_data[4] = {
-		DO_5HZ | OM_UHP | TEMP_EN, 	// CTRL_REG1
-		FS_12GAUSS, 			// CTRL_REG2
-		MD_CONTINUOUS, 			// CTRL_REG3
-		OMZ_UHP 			// CTRL_REG4
+			DO_5HZ | OM_UHP | TEMP_EN, // CTRL_REG1
+			FS_12GAUSS,								 // CTRL_REG2
+			MD_CONTINUOUS,						 // CTRL_REG3
+			OMZ_UHP										 // CTRL_REG4
 	};
 
 	// Write configuration data to control registers 1 to 4
-	if (LIS3MDL_WriteRegisters(hlis3mdl, LIS3MDL_CTRL_REG1, cfg_data, 4) != HAL_OK) return HAL_ERROR;
-	if (__LIS3MDL_Set_Sensitivity(hlis3mdl) != HAL_OK) return HAL_ERROR;
+	if (LIS3MDL_WriteRegisters(hlis3mdl, LIS3MDL_CTRL_REG1, cfg_data, 4) != HAL_OK)
+		return HAL_ERROR;
+	if (__LIS3MDL_Set_Sensitivity(hlis3mdl) != HAL_OK)
+		return HAL_ERROR;
 
 	return HAL_OK;
 }
 
 // Read / Write Generic Registers
 
-HAL_StatusTypeDef LIS3MDL_ReadRegister(LIS3MDL_HandleTypeDef* hlis3mdl, uint8_t reg, uint8_t* data)
+HAL_StatusTypeDef LIS3MDL_ReadRegister(LIS3MDL_HandleTypeDef *hlis3mdl, uint8_t reg, uint8_t *data)
 {
 	return HAL_I2C_Mem_Read(hlis3mdl->hi2c, hlis3mdl->address, reg, I2C_MEMADD_SIZE_8BIT, data, 1, I2C_TIMEOUT);
 }
 
-HAL_StatusTypeDef LIS3MDL_ReadRegisters(LIS3MDL_HandleTypeDef* hlis3mdl, uint8_t reg, uint8_t* data, uint16_t size)
+HAL_StatusTypeDef LIS3MDL_ReadRegisters(LIS3MDL_HandleTypeDef *hlis3mdl, uint8_t reg, uint8_t *data, uint16_t size)
 {
 	return HAL_I2C_Mem_Read(hlis3mdl->hi2c, hlis3mdl->address, reg, I2C_MEMADD_SIZE_8BIT, data, size, I2C_TIMEOUT);
 }
 
-HAL_StatusTypeDef LIS3MDL_WriteRegisters(LIS3MDL_HandleTypeDef* hlis3mdl, uint8_t reg, uint8_t* data, uint16_t size)
+HAL_StatusTypeDef LIS3MDL_WriteRegisters(LIS3MDL_HandleTypeDef *hlis3mdl, uint8_t reg, uint8_t *data, uint16_t size)
 {
 	return HAL_I2C_Mem_Write(hlis3mdl->hi2c, hlis3mdl->address, reg, I2C_MEMADD_SIZE_8BIT, data, size, I2C_TIMEOUT);
 }
 
-HAL_StatusTypeDef LIS3MDL_WriteRegister(LIS3MDL_HandleTypeDef* hlis3mdl, uint8_t reg, uint8_t data)
+HAL_StatusTypeDef LIS3MDL_WriteRegister(LIS3MDL_HandleTypeDef *hlis3mdl, uint8_t reg, uint8_t data)
 {
 	return HAL_I2C_Mem_Write(hlis3mdl->hi2c, hlis3mdl->address, reg, I2C_MEMADD_SIZE_8BIT, &data, 1, I2C_TIMEOUT);
 }
 
 // Read / Write Specific Registers
 
-HAL_StatusTypeDef LIS3MDL_ReadStatus(LIS3MDL_HandleTypeDef* hlis3mdl)
+HAL_StatusTypeDef LIS3MDL_ReadStatus(LIS3MDL_HandleTypeDef *hlis3mdl)
 {
 	return LIS3MDL_ReadRegister(hlis3mdl, LIS3MDL_STATUS_REG, &hlis3mdl->status);
 }
 
-HAL_StatusTypeDef LIS3MDL_ReadXYZ(LIS3MDL_HandleTypeDef* hlis3mdl)
+HAL_StatusTypeDef LIS3MDL_ReadXYZ(LIS3MDL_HandleTypeDef *hlis3mdl)
 {
 	// Burst read 6 bytes starting from OUT_X_L
-	uint8_t data[6] = { 0 };
+	uint8_t data[6] = {0};
 	HAL_StatusTypeDef err = LIS3MDL_ReadRegisters(hlis3mdl, LIS3MDL_OUT_X_L, data, 6);
 
-	if (err != HAL_OK) return err;
+	if (err != HAL_OK)
+		return err;
 
 	// Combine the 8-bit high and low bytes into 16-bit values
 	int16_t raw_x = ((uint16_t)data[1] << 8) | data[0];
